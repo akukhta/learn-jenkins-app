@@ -1,7 +1,15 @@
 pipeline {
     agent any
-
+    options {
+        skipDefaultCheckout()
+    }
     stages {
+        stage('Clean WS') {
+            steps {
+                cleanWs()
+                checkout scm 
+            }
+        }
         stage('Build') {
             agent {
                 docker {
@@ -11,7 +19,12 @@ pipeline {
             }
 
             steps {
+                //checkout scm 
+                sh 'ls -al'
+                sh 'node --version'
+                sh 'npm ci --cache /tmp/empty-cache'
                 sh 'npm run build'
+                sh 'ls -al'
             }
         }
     }
