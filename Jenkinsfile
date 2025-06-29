@@ -7,7 +7,7 @@ pipeline {
         stage('Clean WS') {
             steps {
                 cleanWs()
-                checkout scm 
+                checkout scm
             }
         }
         stage('Build') {
@@ -19,12 +19,25 @@ pipeline {
             }
 
             steps {
-                //checkout scm 
                 sh 'ls -al'
                 sh 'node --version'
                 sh 'npm ci --cache /tmp/empty-cache'
                 sh 'npm run build'
                 sh 'ls -al'
+            }
+        }
+
+        stage('Test')
+        {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh 'test -f build/index.html'
+                sh 'npm test'
             }
         }
     }
