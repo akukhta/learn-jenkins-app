@@ -48,7 +48,8 @@ pipeline {
                 npm ci --cache /tmp/empty-cache
                 npm install serve --cache /tmp/empty-cache
                 echo 'Serve installed'
-                node_modules/.bin/serve -s build
+                node_modules/.bin/serve -s build &
+                sleep 10
                 npx playwright test
                 '''
             }
