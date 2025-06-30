@@ -46,9 +46,9 @@ pipeline {
             steps {
                 sh '''
                 npm ci --cache /tmp/empty-cache
-                npm install -g serve
+                npm install serve --cache /tmp/empty-cache
                 echo 'Serve installed'
-                serve -s build
+                node_modules/.bin/serve -s build
                 npx playwright test
                 '''
             }
