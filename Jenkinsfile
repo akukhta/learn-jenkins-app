@@ -38,6 +38,7 @@ pipeline {
                         }
                     }
                     steps {
+                        sh 'ls'
                         sh 'test -f build/index.html'
                         sh 'npm test'
                     }
