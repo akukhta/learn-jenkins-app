@@ -80,6 +80,21 @@ pipeline {
                     }
                 }
             }
+            stage('Deploy') {
+                agent {
+                    docker {
+                        image 'node:18-alpine'
+                        reuseNode true
+                        args "-v /etc/passwd:/etc/passwd"
+                    }
+                }
+                steps {
+                    sh '''
+                        npm install netlify-cli --cache /tmp/empty-cache
+                        node_modules/.bin/netlify --version
+                    '''
+                }
+            }
     }
 }
 
