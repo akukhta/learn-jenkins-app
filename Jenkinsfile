@@ -4,11 +4,20 @@ pipeline {
     options {
         skipDefaultCheckout()
     }
+    environment {
+        NETLIFY_SITE_ID = '4eb3438a-6bee-4b9b-969a-25e84109f695'
+        NETLIFY_AUTH_TOKEN = credentials('netlify_token')
+    }
     stages {
         stage('Clean WS') {
             steps {
                 cleanWs()
                 checkout scm
+            }
+        }
+        stage('Check token') {
+            steps {
+                sh 'echo "${NETLIFY_AUTH_TOKEN}"'
             }
         }
         stage('Build') {
@@ -79,7 +88,7 @@ pipeline {
                         )
                     }
                 }
-            }
+        }
             stage('Deploy') {
                 agent {
                     docker {
