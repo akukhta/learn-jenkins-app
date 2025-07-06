@@ -89,7 +89,7 @@ pipeline {
                     docker {
                         image 'node:18-alpine'
                         reuseNode true
-                        args "-v /etc/passwd:/etc/passwd"
+                        args "-u root:root"
                     }
                 }
                 steps {
