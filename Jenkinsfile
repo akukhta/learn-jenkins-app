@@ -15,11 +15,6 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Check token') {
-            steps {
-                sh 'echo "${NETLIFY_AUTH_TOKEN}"'
-            }
-        }
         stage('Build') {
             agent {
                 docker {
@@ -101,6 +96,7 @@ pipeline {
                     sh '''
                         npm install netlify-cli@20.1.1 --cache /tmp/empty-cache
                         node_modules/.bin/netlify --version
+                        node_modules/.bin/netlify status
                     '''
                 }
             }
