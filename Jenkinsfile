@@ -89,7 +89,7 @@ pipeline {
                     docker {
                         image 'node:18-alpine'
                         reuseNode true
-                        args "-u root:root"
+                        args '-u root:root'
                     }
                 }
                 steps {
@@ -97,6 +97,7 @@ pipeline {
                         npm install netlify-cli@20.1.1 --cache /tmp/empty-cache
                         node_modules/.bin/netlify --version
                         node_modules/.bin/netlify status
+                        node_modules/.bin/netlify deploy --dir=build --prod
                     '''
                 }
             }
