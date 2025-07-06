@@ -90,7 +90,7 @@ pipeline {
                 }
                 steps {
                     sh '''
-                        npm install netlify-cli --cache /tmp/empty-cache
+                        npm install netlify-cli@20.1.1 --cache /tmp/empty-cache
                         node_modules/.bin/netlify --version
                     '''
                 }
