@@ -84,23 +84,54 @@ pipeline {
                     }
                 }
         }
-            stage('Deploy') {
-                agent {
-                    docker {
-                        image 'node:18-alpine'
-                        reuseNode true
-                        args '-u root:root'
-                    }
-                }
-                steps {
-                    sh '''
-                        npm install netlify-cli@20.1.1 --cache /tmp/empty-cache
-                        node_modules/.bin/netlify --version
-                        node_modules/.bin/netlify status
-                        node_modules/.bin/netlify deploy --dir=build --prod
-                    '''
+
+        stage('Deploy') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                    args '-u root:root'
                 }
             }
+            steps {
+                sh '''
+                    npm install netlify-cli@20.1.1 --cache /tmp/empty-cache
+                    node_modules/.bin/netlify --version
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy --dir=build --prod
+                '''
+            }
+        }
+        stage('Production E2E Test') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    reuseNode true
+                }
+            }
+            environment {
+                CI_ENVIRONMENT_URL = 'https://incandescent-strudel-0ca7bc.netlify.app'
+            }
+            steps {
+                sh '''
+                    npx playwright test --reporter=html
+            '''
+            }
+            post {
+                success {
+                    publishHTML([
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    icon: '', keepAll:
+                    false,
+                    reportDir: 'playwright-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Production HTML Report',
+                    reportTitles: '',
+                    useWrapperFileDirectly: true]
+                )
+                }
+            }
+        }
     }
 }
-
