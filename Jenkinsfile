@@ -93,10 +93,11 @@ pipeline {
             }
             steps {
                 sh '''
-                    npm install netlify-cli@20.1.1 --cache /tmp/empty-cache
+                    npm install netlify-cli@20.1.1 node-jq --cache /tmp/empty-cache
                     node_modules/.bin/netlify --version
                     node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build 
+                    node_modules/.bin/netlify deploy --dir=build --json > deploy_output.json
+                    node_modules/.bin/node-jq -r '.deploy_url' deploy_output.json
                 '''
             }
         }
