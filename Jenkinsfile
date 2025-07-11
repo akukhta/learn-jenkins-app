@@ -27,16 +27,9 @@ def deploy(String environment) {
     return 'localhost:3000'
 }
 
-properties([
-    parameters([
-        string(name: 'BRANCH', defaultValue: 'main', description: 'Branch To Build')
-    ])
-])
-
 node {
     stage('Checkout SCM') {
-        println "Checking-out ${BRANCH} branch"
-        git branch: "${BRANCH}", credentialsId: 'gh', url: "https://github.com/akukhta/learn-jenkins-app.git"
+        checkout scm
     }
     stage('Test') {
         deploy("local")
