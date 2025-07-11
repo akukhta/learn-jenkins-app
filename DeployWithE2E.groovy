@@ -17,10 +17,14 @@ def deploy(String environment) {
 
     steps << deploy_step
 
-    // def staging_url = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy_output.json",
-    //                     returnStdout: true)
-
     steps.each { println "${it}" }
+
+    if (environment != 'local') {
+        return sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy_output.json",
+            returnStdout: true)
+    }
+
+    return 'localhost:3000'
 }
 
 return this
