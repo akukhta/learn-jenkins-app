@@ -35,6 +35,7 @@ properties([
 
 node {
     stage('Checkout SCM') {
+        println "Checking-out ${BRANCH} branch"
         git branch: "${BRANCH}", credentialsId: 'gh', url: "https://github.com/akukhta/learn-jenkins-app.git"
     }
     stage('Test') {
