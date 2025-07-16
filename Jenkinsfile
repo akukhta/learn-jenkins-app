@@ -7,6 +7,7 @@ pipeline {
     environment {
         NETLIFY_SITE_ID = '4eb3438a-6bee-4b9b-969a-25e84109f695'
         NETLIFY_AUTH_TOKEN = credentials('netlify_token')
+        REACT_APP_VERSION = "1.0.$BUILD_ID"
     }
     stages {
         stage('Clean WS') {
@@ -24,6 +25,8 @@ pipeline {
             }
 
             steps {
+                println "Building version ${env.REACT_APP_VERSION}"
+
                 sh 'ls -al'
                 sh 'node --version'
                 sh 'npm ci --cache /tmp/empty-cache'
@@ -92,6 +95,8 @@ pipeline {
                 }
             }
             steps {
+                println "Deploy version ${env.REACT_APP_VERSION}"
+
                 sh '''
                     npm install netlify-cli@20.1.1 node-jq --cache /tmp/empty-cache
                     node_modules/.bin/netlify --version
@@ -135,13 +140,6 @@ pipeline {
                 }
             }
         }
-        stage('Approve Production Deployment') {
-            steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                    input 'Deploy to production?'
-                }
-            }
-        }
         stage('Deploy Production') {
             agent {
                 docker {
@@ -151,6 +149,8 @@ pipeline {
                 }
             }
             steps {
+                println "Deploy version ${env.REACT_APP_VERSION}"
+
                 sh '''
                     node_modules/.bin/netlify deploy --dir=build --prod
                 '''
