@@ -16,6 +16,11 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t web-app-tools:ci .'
+            }
+        }
         stage('Build') {
             agent {
                 docker {
@@ -89,7 +94,7 @@ pipeline {
         stage('Deploy Staging') {
             agent {
                 docker {
-                    image 'node:18-alpine'
+                    image 'web-app-tools:ci'
                     reuseNode true
                     args '-u root:root'
                 }
@@ -98,13 +103,12 @@ pipeline {
                 println "Deploy version ${env.REACT_APP_VERSION}"
 
                 sh '''
-                    npm install netlify-cli@20.1.1 node-jq --cache /tmp/empty-cache
-                    node_modules/.bin/netlify --version
-                    node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build --json > deploy_output.json
+                    netlify --version
+                    netlify status
+                    netlify deploy --dir=build --json > deploy_output.json
                 '''
                 script {
-                    env.staging_url = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy_output.json",
+                    env.staging_url = sh(script: "node-jq -r '.deploy_url' deploy_output.json",
                         returnStdout: true)
                 }
             }
@@ -112,7 +116,7 @@ pipeline {
         stage('Staging E2E Test') {
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    image 'web-app-tools:ci'
                     reuseNode true
                 }
             }
@@ -143,7 +147,7 @@ pipeline {
         stage('Deploy Production') {
             agent {
                 docker {
-                    image 'node:18-alpine'
+                    image 'web-app-tools:ci'
                     reuseNode true
                     args '-u root:root'
                 }
@@ -152,14 +156,14 @@ pipeline {
                 println "Deploy version ${env.REACT_APP_VERSION}"
 
                 sh '''
-                    node_modules/.bin/netlify deploy --dir=build --prod
+                    netlify deploy --dir=build --prod
                 '''
             }
         }
         stage('Production E2E Test') {
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    image 'web-app-tools:ci'
                     reuseNode true
                 }
             }
