@@ -24,7 +24,7 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    image 'node:18-alpine'
+                    image 'web-app-tools:ci'
                     reuseNode true
                 }
             }
@@ -33,8 +33,8 @@ pipeline {
                 println "Building version ${env.REACT_APP_VERSION}"
 
                 sh 'ls -al'
-                sh 'node --version'
                 sh 'npm ci --cache /tmp/empty-cache'
+                sh 'npm install --cache /tmp/empty-cache'
                 sh 'npm run build'
                 sh 'ls -al'
             }
@@ -43,7 +43,7 @@ pipeline {
             {
                 agent {
                     docker {
-                        image 'node:18-alpine'
+                        image 'web-app-tools:ci'
                         reuseNode true
                     }
                 }
@@ -61,16 +61,13 @@ pipeline {
         stage('E2E Test') {
                 agent {
                     docker {
-                        image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                        image 'web-app-tools:ci'
                         reuseNode true
                     }
                 }
                 steps {
                     sh '''
-                    npm ci --cache /tmp/empty-cache
-                    npm install serve --cache /tmp/empty-cache
-                    echo 'Serve installed'
-                    node_modules/.bin/serve -s build &
+                    serve -s build &
                     sleep 10
                     npx playwright test --reporter=html
                     '''
