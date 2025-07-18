@@ -16,11 +16,6 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t web-app-tools:ci .'
-            }
-        }
         stage('Build') {
             agent {
                 docker {
